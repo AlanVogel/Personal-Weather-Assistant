@@ -1,6 +1,7 @@
 """Groq implementation of the recommendation generator Protocol."""
 
 import asyncio
+import re
 
 from groq import (
     APIConnectionError,
@@ -22,6 +23,7 @@ from app.core.logging import get_logger
 from app.recommendations.models import DailyRecommendation, FollowUpAnswer
 from app.recommendations.parsing import extract_first_json_object
 from app.recommendations.prompts import (
+    FOLLOWUP_SYSTEM_PROMPT,
     SYSTEM_PROMPT,
     build_followup_prompt,
     build_recommendation_prompt,
@@ -29,6 +31,9 @@ from app.recommendations.prompts import (
 from app.weather.models import WeatherSnapshot
 
 logger = get_logger(__name__)
+
+# Strips fenced code blocks (```...```) the model may append to a prose answer.
+_CODE_FENCE_RE = re.compile(r"```.*?```", re.DOTALL)
 
 
 class GroqRecommendationGenerator:
@@ -123,13 +128,16 @@ class GroqRecommendationGenerator:
 
         raw_response = await self._chat(
             messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "system", "content": FOLLOWUP_SYSTEM_PROMPT},
                 {"role": "user", "content": prompt},
             ],
             json_mode=False,
         )
 
-        return FollowUpAnswer(answer=raw_response.strip())
+        # Defense in depth: even with a prose-only system prompt, the model can
+        # append a JSON/code block — strip any fenced blocks before returning.
+        answer = _CODE_FENCE_RE.sub("", raw_response).strip()
+        return FollowUpAnswer(answer=answer)
 
     async def _chat(
         self,

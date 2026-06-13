@@ -15,6 +15,13 @@ Your responses must:
 Never invent weather details not present in the data. Never include disclaimers about being an AI."""
 
 
+FOLLOWUP_SYSTEM_PROMPT = """You are a personal weather assistant answering a follow-up question.
+
+Reply in plain, conversational prose — 2 to 4 sentences. Be specific and practical.
+Do NOT output JSON, code blocks, bullet lists, or field names; just answer naturally.
+Never invent weather details not present in the data. Never include disclaimers about being an AI."""
+
+
 RECOMMENDATION_SCHEMA = """{
   "summary": "Brief one-sentence summary of the day",
   "clothing": {

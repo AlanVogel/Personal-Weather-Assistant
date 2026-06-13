@@ -105,6 +105,24 @@ async def test_follow_up_returns_trimmed_answer(
     assert answer.answer == "Cycling along the Sava sounds great today."
 
 
+async def test_follow_up_strips_trailing_json_block(
+    sample_weather: WeatherSnapshot,
+    sample_recommendation: DailyRecommendation,
+) -> None:
+    # The model sometimes appends a JSON code block to a prose answer — drop it.
+    raw = (
+        "It stays warm and clear in the west of the city, so the earlier advice holds.\n\n"
+        '```json\n{"temperature": 29.4, "clothing": ["sun hat"]}\n```'
+    )
+    gen = _generator(_returns(raw))
+
+    answer = await gen.follow_up(sample_weather, sample_recommendation, "West side?")
+
+    assert "```" not in answer.answer
+    assert "json" not in answer.answer.lower()
+    assert answer.answer.startswith("It stays warm and clear")
+
+
 # ---------- Parsing / validation failures ----------
 
 

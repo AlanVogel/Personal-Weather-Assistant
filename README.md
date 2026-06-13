@@ -3,8 +3,8 @@
 Weather data combined with AI-powered personalized recommendations for clothing,
 activities, and health. Built as a take-home task for Graia AI Solution Engineer position.
 
-**Live demo:** _[Vercel URL after deployment]_  
-**Backend API:** _[Railway URL after deployment]_
+**Live demo:** <https://personal-weather-assistant.vercel.app>  
+**Backend API:** <https://personal-weather-assistant-production.up.railway.app> ([API docs](https://personal-weather-assistant-production.up.railway.app/docs))
 
 ---
 
