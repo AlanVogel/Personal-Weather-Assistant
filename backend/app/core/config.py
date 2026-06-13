@@ -1,10 +1,10 @@
 """Application settings loaded from environment variables."""
 
 from functools import lru_cache
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -50,15 +50,17 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = True
     rate_limit: str = "20/minute"
 
-    # CORS
-    allowed_origins: list[str] = Field(
+    # CORS. `NoDecode` stops pydantic-settings from JSON-decoding the env var
+    # before our validator runs — without it, a plain/comma-separated value like
+    # "https://a.com,https://b.com" raises a JSON parse error at startup.
+    allowed_origins: Annotated[list[str], NoDecode] = Field(
         default_factory=lambda: ["http://localhost:5173", "http://localhost:3000"]
     )
 
     @field_validator("allowed_origins", mode="before")
     @classmethod
     def parse_origins(cls, value: str | list[str]) -> list[str]:
-        """Allow comma-separated string from env var."""
+        """Accept a comma-separated string (or a single origin) from the env var."""
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
