@@ -1,0 +1,13 @@
+# Railway reads this when the service's Root Directory is set to `backend`,
+# which makes the Docker build context `backend/` — matching the Dockerfile's
+# context-relative COPY instructions.
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 100
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
