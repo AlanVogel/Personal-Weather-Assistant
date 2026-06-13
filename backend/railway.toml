@@ -6,7 +6,10 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+# Wrapped in a shell so $PORT is expanded. Railway runs startCommand in exec
+# form, which does NOT expand variables — without the shell, uvicorn receives
+# the literal string "$PORT" and crashes on boot.
+startCommand = "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}'"
 healthcheckPath = "/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"
