@@ -418,16 +418,3 @@ curl -X POST http://localhost:8000/api/recommendations/followup \
 - **Redis-backed rate limiting** so the per-IP limits hold across multiple
   instances (the in-memory limiter is per-process today)
 - **Multi-language support** — recommendations in user's language
-
-### Honest time spent
-
-~14 hours over 4 days. Above the suggested 3-5 day budget but I went deliberately
-deep on architecture (Protocol-based DI, lifespan management, single-flight caching)
-because production-grade code is what I'd ship at Graia, not minimum-viable.
-
----
-
-## Author
-
-Alan Vogel  
-[github.com/AlanVogel](https://github.com/AlanVogel)
